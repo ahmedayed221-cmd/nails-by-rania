@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nails by Rania — Portfolio</title>
+<meta name="description" content="A minimalist dark-mode portfolio showcasing photography, design and case-study work." />
+
+<!-- Tailwind CSS — precompiled locally (see build/ folder) so the site has
+     zero runtime dependency on a CDN and works fully offline. To customize
+     colors/fonts, edit build/tailwind.config.js and rebuild (run from inside build/,
+     pinned to tailwindcss@3 — see README.md for why):
+     cd build && npx tailwindcss@3 -i input.css -o ../assets/tailwind.css --config tailwind.config.js --minify -->
+<link rel="stylesheet" href="assets/tailwind.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-feature-settings: "ss01"; }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #0a0a0b; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a40; }
+
+  .card-img { transition: transform 900ms cubic-bezier(0.16,1,0.3,1); }
+  .card:hover .card-img { transform: scale(1.06); }
+  .card-overlay {
+    background: linear-gradient(180deg, rgba(10,10,11,0) 40%, rgba(10,10,11,0.92) 100%);
+    opacity: 0;
+    transition: opacity 500ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .card:hover .card-overlay { opacity: 1; }
+  .card-meta { transform: translateY(10px); opacity: 0; transition: all 500ms cubic-bezier(0.16,1,0.3,1) 60ms; }
+  .card:hover .card-meta { transform: translateY(0); opacity: 1; }
+
+  .filter-btn { position: relative; }
+  .filter-btn::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -9px;
+    height: 1px;
+    background: #fafafa;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 400ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .filter-btn.active::after,
+  .filter-btn:hover::after { transform: scaleX(1); }
+
+  .fade-in { animation: fadeIn 600ms cubic-bezier(0.16,1,0.3,1) both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  #lightbox { backdrop-filter: blur(10px); }
+  .lb-img { transition: opacity 300ms ease; }
+
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+</style>
+</head>
+
+<body class="bg-ink-950 text-ink-50 font-sans antialiased selection:bg-accent selection:text-ink-950">
+<div class="grain fixed inset-0 z-[999]"></div>
+
+<!-- ============================= HEADER ============================= -->
+<header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-white/5 backdrop-blur-xl bg-ink-950/70 transition-all">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-[10px] font-serif italic text-xl tracking-wide">
+      <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="text-accent shrink-0">
+        <ellipse cx="50" cy="35" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4"/>
+        <ellipse cx="64.3" cy="45.2" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(72 64.3 45.2)"/>
+        <ellipse cx="59.1" cy="61.8" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(144 59.1 61.8)"/>
+        <ellipse cx="40.9" cy="61.8" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(216 40.9 61.8)"/>
+        <ellipse cx="35.7" cy="45.2" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(288 35.7 45.2)"/>
+        <circle cx="50" cy="50" r="4" fill="currentColor"/>
+      </svg>
+      <span>Nails by Rania<span class="text-accent">.</span></span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-10 text-sm text-ink-400">
+      <a href="#work" class="hover:text-ink-50 transition-colors">Projects</a>
+      <a href="#about" class="hover:text-ink-50 transition-colors">About</a>
+      <a href="#contact" class="hover:text-ink-50 transition-colors">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a href="#contact" class="hidden sm:inline-flex items-center text-sm border border-white/15 rounded-full px-5 py-2 hover:bg-ink-50 hover:text-ink-950 transition-colors duration-300">
+        Let's talk
+      </a>
+      <button id="menu-btn" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5" aria-label="Open menu">
+        <span class="w-5 h-px bg-ink-50"></span>
+        <span class="w-5 h-px bg-ink-50"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- mobile menu -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-ink-950/95 px-6 py-6 flex flex-col gap-5 text-ink-300">
+    <a href="#work" class="mobile-link">Projects</a>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#contact" class="mobile-link">Contact</a>
+  </div>
+</header>
+
+<!-- ============================= HERO ============================= -->
+<section id="top" class="relative pt-40 pb-20 px-6 lg:px-10 overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <p class="fade-in text-accent text-xs tracking-[0.3em] uppercase mb-6">Photography · Nail Art · Design</p>
+    <h1 class="fade-in text-[2.5rem] sm:text-6xl lg:text-7xl font-serif leading-[1.05] max-w-4xl" style="animation-delay:80ms">
+      Detail‑obsessed work,<br class="hidden sm:block" /> shot and shown <span class="italic text-ink-400">with care.</span>
+    </h1>
+    <p class="fade-in mt-8 text-ink-400 max-w-xl leading-relaxed" style="animation-delay:160ms">
+      A curated collection of hand-painted nail art, close-up photography and
+      case studies — built for clients who care about the finish as much as the idea.
+    </p>
+    <div class="fade-in mt-10 flex items-center gap-6" style="animation-delay:240ms">
+      <a href="#work" class="inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
+        View the gallery
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <span class="text-sm text-ink-600">7 projects · updated 2026</span>
+    </div>
+  </div>
+  <div class="pointer-events-none absolute -top-40 right-0 w-[36rem] h-[36rem] bg-accent/10 blur-[140px] rounded-full"></div>
+</section>
+
+<!-- ============================= FILTER BAR ============================= -->
+<section class="sticky top-20 z-40 bg-ink-950/90 backdrop-blur-xl border-y border-white/5 px-6 lg:px-10">
+  <div class="max-w-7xl mx-auto py-5 flex items-center gap-8 overflow-x-auto no-scrollbar text-sm">
+    <div id="filters" class="flex items-center gap-8 text-ink-400 whitespace-nowrap"></div>
+    <div class="ml-auto hidden sm:flex items-center gap-3 text-ink-600 whitespace-nowrap">
+      <span id="carousel-progress"></span>
+      <span aria-hidden="true">·</span>
+      <span id="result-count"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= GALLERY ============================= -->
+<main id="work" class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+  <div class="relative">
+    <button id="carousel-prev" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" aria-label="Scroll left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div id="gallery" class="flex gap-5 overflow-x-auto snap-x snap-mandatory cursor-grab"></div>
+    <button id="carousel-next" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" aria-label="Scroll right">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</main>
+
+<!-- ============================= ABOUT ============================= -->
+<section id="about" class="border-t border-white/5 px-6 lg:px-10 py-24">
+  <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-10">
+    <div class="md:col-span-4">
+      <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4">About</p>
+      <h2 class="text-3xl font-serif">The hands behind the work</h2>
+    </div>
+    <div class="md:col-span-7 md:col-start-6 text-ink-400 leading-relaxed space-y-5">
+      <p>
+        I'm Rania, a nail artist working at the intersection of fine detail
+        and everyday craft — hand-painted sets, sculpted 3D florals, and the
+        close-up photography and process reels that document them. Every set
+        on this site started as a client brief and ended up as something I
+        was proud to shoot close up.
+      </p>
+      <p>
+        This portfolio is intentionally minimal: dark background, high-contrast
+        type, and a grid that puts the work first. Filter by category above, or
+        open any piece for the full write-up.
+      </p>
+      <div class="flex gap-10 pt-4 text-ink-50">
+        <div><p class="text-2xl font-serif">7+</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Projects</p></div>
+        <div><p class="text-2xl font-serif">3</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Categories</p></div>
+        <div><p class="text-2xl font-serif">2026</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Latest work</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= CONTACT / FOOTER ============================= -->
+<footer id="contact" class="border-t border-white/5 px-6 lg:px-10 py-24">
+  <div class="max-w-7xl mx-auto">
+    <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4">Contact</p>
+    <h2 class="text-3xl sm:text-5xl font-serif max-w-2xl">
+      Have a project in mind? Let's make something worth a second look.
+    </h2>
+    <div class="mt-10 flex flex-wrap items-center gap-6">
+      <a href="mailto:rania93mallem@gmail.com" class="inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
+        rania93mallem@gmail.com
+      </a>
+      <div class="flex gap-6 text-sm text-ink-400">
+        <a href="https://www.instagram.com/nailsbyrania_m?igsh=MTZld3I3d2VkNmw5" class="hover:text-ink-50 transition-colors">Instagram</a>
+      </div>
+    </div>
+    <div class="mt-20 pt-8 border-t border-white/5">
+      <div class="flex flex-col items-center gap-3 mb-8">
+        <svg width="46" height="46" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="text-accent">
+          <ellipse cx="50" cy="35" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4"/>
+          <ellipse cx="64.3" cy="45.2" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(72 64.3 45.2)"/>
+          <ellipse cx="59.1" cy="61.8" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(144 59.1 61.8)"/>
+          <ellipse cx="40.9" cy="61.8" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(216 40.9 61.8)"/>
+          <ellipse cx="35.7" cy="45.2" rx="8" ry="17" fill="none" stroke="currentColor" stroke-width="4" transform="rotate(288 35.7 45.2)"/>
+          <circle cx="50" cy="50" r="4" fill="currentColor"/>
+        </svg>
+        <span class="font-serif italic text-xl tracking-wide">Nails by Rania<span class="text-accent">.</span></span>
+      </div>
+      <div class="flex flex-col sm:flex-row justify-between gap-4 text-xs text-ink-600">
+        <p>© 2026 Nails by Rania. All rights reserved.</p>
+        <p>Built with Tailwind CSS &amp; vanilla JS.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================= LIGHTBOX ============================= -->
+<div id="lightbox" class="fixed inset-0 z-[100] hidden bg-ink-950/95">
+  <button id="lb-close" class="absolute top-6 right-6 sm:top-8 sm:right-10 z-10 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Close">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+
+  <button id="lb-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Previous">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button id="lb-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Next">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <div class="h-full w-full flex flex-col lg:flex-row items-center gap-0 lg:gap-0">
+    <div class="flex-1 h-1/2 lg:h-full w-full flex items-center justify-center p-6 sm:p-12">
+      <img id="lb-img" src="" alt="" class="lb-img max-h-full max-w-full object-contain rounded-sm shadow-2xl" />
+      <video id="lb-video" src="" controls playsinline class="lb-img hidden w-full h-full max-h-full max-w-full object-contain rounded-sm shadow-2xl"></video>
+    </div>
+    <div class="w-full lg:w-[26rem] lg:h-full border-t lg:border-t-0 lg:border-l border-white/10 px-8 py-8 sm:px-12 sm:py-12 overflow-y-auto">
+      <p id="lb-cat" class="text-accent text-xs tracking-[0.3em] uppercase mb-3"></p>
+      <h3 id="lb-title" class="text-2xl sm:text-3xl font-serif mb-4"></h3>
+      <p id="lb-desc" class="text-ink-400 leading-relaxed text-sm mb-8"></p>
+      <dl class="space-y-3 text-sm">
+        <div class="flex justify-between border-b border-white/5 pb-3">
+          <dt class="text-ink-600">Client</dt><dd id="lb-client" class="text-ink-200"></dd>
+        </div>
+        <div class="flex justify-between border-b border-white/5 pb-3">
+          <dt class="text-ink-600">Date</dt><dd id="lb-date" class="text-ink-200"></dd>
+        </div>
+        <div class="flex justify-between border-b border-white/5 pb-3">
+          <dt class="text-ink-600">Category</dt><dd id="lb-category-text" class="text-ink-200"></dd>
+        </div>
+      </dl>
+      <p class="mt-8 text-xs text-ink-600">Use ← → to navigate, Esc to close</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   PLACEHOLDER PROJECT DATA
+   ---------------------------------------------------------------------
+   Swap this array with your own work. Each item needs:
+     id        – unique string
+     title     – project title shown on hover + in the lightbox
+     category  – must match one of CATEGORY_LIST below (drives the filters)
+     year      – shown on hover + lightbox
+     client    – shown in lightbox meta
+     date      – shown in lightbox meta (free text, e.g. "March 2026")
+     image     – path to the thumbnail/full image (local path or URL)
+     description – longer copy shown in the lightbox
+     size      – "tall" | "normal" | "wide" — purely cosmetic, varies card height
+   ========================================================================= */
+const CATEGORY_LIST = ["All", "Photography", "Nail Art", "Case Studies"];
+
+const PROJECTS = [
+  {
+    id: "proj-01",
+    title: "Sculpted Petals",
+    category: "Nail Art",
+    year: "2026",
+    client: "Private client",
+    date: "August 2026",
+    image: "assets/images/nail-07.jpg",
+    description: "Sky-blue French tips paired with hand-sculpted 3D floral accents and gold micro-beading. Shot in natural light to capture the gel's translucency.",
+    size: "tall",
+  },
+  {
+    id: "proj-02",
+    title: "Ivory Bloom",
+    category: "Nail Art",
+    year: "2026",
+    client: "Studio session",
+    date: "August 2026",
+    image: "assets/images/nail-02.jpg",
+    description: "A soft ivory french set with sculpted 3D florals and warm gold detailing — designed for an editorial hand-modeling shoot.",
+    size: "normal",
+  },
+  {
+    id: "proj-03",
+    title: "Frost Line",
+    category: "Nail Art",
+    year: "2025",
+    client: "Winter capsule",
+    date: "December 2025",
+    image: "assets/images/nail-01.jpg",
+    description: "Fine-line snowflake and stripe work in white on a sheer pink base, part of a limited winter capsule collection.",
+    size: "normal",
+  },
+  {
+    id: "proj-04",
+    title: "Candy Cane Set",
+    category: "Photography",
+    year: "2025",
+    client: "Holiday campaign",
+    date: "December 2025",
+    image: "assets/images/nail-03.jpg",
+    description: "Close-up product photography for a holiday nail-art campaign — deep reds, glitter accents and hand-painted snowflakes.",
+    size: "wide",
+  },
+  {
+    id: "proj-05",
+    title: "Ruby Dot Minimal",
+    category: "Case Studies",
+    year: "2026",
+    client: "Minimal line study",
+    date: "June 2026",
+    image: "assets/images/nail-04.jpg",
+    description: "A case study in restraint — soft pink base, single-line French edges and scattered ruby micro-dots. Documented from sketch to final set.",
+    size: "normal",
+  },
+  {
+    id: "proj-06",
+    title: "Cobalt Bloom",
+    category: "Nail Art",
+    year: "2026",
+    client: "Private client",
+    date: "May 2026",
+    image: "assets/images/nail-05.jpg",
+    description: "Navy polka-dot tips with a single hand-painted cobalt floral accent nail, finished with high-gloss top coat.",
+    size: "tall",
+  },
+  {
+    id: "proj-07",
+    title: "Citrus Flame",
+    category: "Photography",
+    year: "2026",
+    client: "Summer editorial",
+    date: "July 2026",
+    image: "assets/images/nail-06.jpg",
+    description: "Warm ombré tips in yellow-to-orange with hand-painted florals and fine red detailing, photographed for a summer editorial spread.",
+    size: "normal",
+  },
+];
+
+/* ========================================================================= */
+
+const galleryEl = document.getElementById("gallery");
+const filtersEl = document.getElementById("filters");
+const resultCountEl = document.getElementById("result-count");
+const progressEl = document.getElementById("carousel-progress");
+const carouselPrevBtn = document.getElementById("carousel-prev");
+const carouselNextBtn = document.getElementById("carousel-next");
+
+let activeCategory = "All";
+
+function renderFilters() {
+  filtersEl.innerHTML = CATEGORY_LIST.map((cat) => `
+    <button
+      class="filter-btn pb-1 transition-colors ${cat === activeCategory ? "active text-ink-50" : "hover:text-ink-50"}"
+      data-cat="${cat}"
+    >${cat}</button>
+  `).join("");
+
+  filtersEl.querySelectorAll(".filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.cat;
+      renderFilters();
+      renderGallery();
+    });
+  });
+}
+
+function renderGallery() {
+  const items = PROJECTS.filter((p) => activeCategory === "All" || p.category === activeCategory);
+  resultCountEl.textContent = `${items.length} project${items.length === 1 ? "" : "s"}`;
+
+  galleryEl.innerHTML = items.map((p, i) => `
+    <div class="shrink-0 w-[70vw] md:w-[420px] snap-start fade-in" style="animation-delay:${i * 60}ms">
+      <button
+        class="card group relative w-full aspect-[4/5] overflow-hidden rounded-md border border-white/5 bg-ink-900 block text-left"
+        data-id="${p.id}"
+      >
+        <img src="${p.image}" alt="${p.title}" loading="lazy" draggable="false"
+             class="card-img absolute inset-0 w-full h-full object-cover" />
+        ${p.video ? `
+        <div class="absolute top-3 right-3 w-9 h-9 rounded-full bg-ink-950/70 backdrop-blur flex items-center justify-center border border-white/10">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="text-ink-50 translate-x-[1px]"><path d="M8 5v14l11-7z"/></svg>
+        </div>` : ""}
+        <div class="card-overlay absolute inset-0"></div>
+        <div class="card-meta absolute bottom-0 left-0 right-0 p-5">
+          <p class="text-[11px] tracking-[0.25em] uppercase text-accent mb-1">${p.category} · ${p.year}</p>
+          <h3 class="text-lg font-serif text-ink-50">${p.title}</h3>
+        </div>
+      </button>
+    </div>
+  `).join("");
+
+  galleryEl.querySelectorAll(".card").forEach((card) => {
+    card.addEventListener("click", () => {
+      if (carouselDragMoved) return;
+      openLightbox(card.dataset.id);
+    });
+  });
+
+  galleryEl.scrollLeft = 0;
+  updateCarouselProgress();
+}
+
+/* ---------------------------- Carousel controls ---------------------------- */
+const CAROUSEL_GAP_PX = 20; // matches gap-5
+
+function carouselStep() {
+  const first = galleryEl.firstElementChild;
+  return first ? first.getBoundingClientRect().width + CAROUSEL_GAP_PX : 0;
+}
+
+function updateCarouselProgress() {
+  const cards = Array.from(galleryEl.children);
+  if (!cards.length) { progressEl.textContent = ""; return; }
+  let closest = 0;
+  let closestDist = Infinity;
+  cards.forEach((card, i) => {
+    const dist = Math.abs(card.offsetLeft - galleryEl.scrollLeft);
+    if (dist < closestDist) { closestDist = dist; closest = i; }
+  });
+  progressEl.textContent = `${closest + 1} / ${cards.length}`;
+}
+
+let progressRaf = null;
+galleryEl.addEventListener("scroll", () => {
+  if (progressRaf) return;
+  progressRaf = requestAnimationFrame(() => { updateCarouselProgress(); progressRaf = null; });
+}, { passive: true });
+
+carouselPrevBtn.addEventListener("click", () => {
+  galleryEl.scrollBy({ left: -carouselStep(), behavior: "smooth" });
+});
+carouselNextBtn.addEventListener("click", () => {
+  galleryEl.scrollBy({ left: carouselStep(), behavior: "smooth" });
+});
+
+/* Click-and-drag scrolling for desktop mouse users (touch already gets native swipe) */
+let carouselDragging = false;
+let carouselDragStartX = 0;
+let carouselDragStartScroll = 0;
+let carouselDragMoved = false;
+
+galleryEl.addEventListener("mousedown", (e) => {
+  carouselDragging = true;
+  carouselDragMoved = false;
+  carouselDragStartX = e.pageX;
+  carouselDragStartScroll = galleryEl.scrollLeft;
+  galleryEl.style.cursor = "grabbing";
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!carouselDragging) return;
+  const dx = e.pageX - carouselDragStartX;
+  if (Math.abs(dx) > 5) carouselDragMoved = true;
+  galleryEl.scrollLeft = carouselDragStartScroll - dx;
+});
+
+window.addEventListener("mouseup", () => {
+  carouselDragging = false;
+  galleryEl.style.cursor = "";
+});
+
+/* ---------------------------- Lightbox ---------------------------- */
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lb-img");
+const lbVideo = document.getElementById("lb-video");
+const lbCat = document.getElementById("lb-cat");
+const lbTitle = document.getElementById("lb-title");
+const lbDesc = document.getElementById("lb-desc");
+const lbClient = document.getElementById("lb-client");
+const lbDate = document.getElementById("lb-date");
+const lbCategoryText = document.getElementById("lb-category-text");
+
+let currentIndex = 0;
+let currentList = PROJECTS;
+
+function openLightbox(id) {
+  currentList = PROJECTS.filter((p) => activeCategory === "All" || p.category === activeCategory);
+  currentIndex = currentList.findIndex((p) => p.id === id);
+  paintLightbox();
+  lb.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function paintLightbox() {
+  const p = currentList[currentIndex];
+
+  lbVideo.pause();
+  lbVideo.removeAttribute("src");
+  lbVideo.load();
+
+  if (p.video) {
+    lbImg.classList.add("hidden");
+    lbVideo.classList.remove("hidden");
+    lbVideo.src = p.video;
+  } else {
+    lbVideo.classList.add("hidden");
+    lbImg.classList.remove("hidden");
+    lbImg.style.opacity = 0;
+    const img = new Image();
+    img.onload = () => { lbImg.src = p.image; lbImg.style.opacity = 1; };
+    img.src = p.image;
+  }
+
+  lbCat.textContent = `${p.category} · ${p.year}`;
+  lbTitle.textContent = p.title;
+  lbDesc.textContent = p.description;
+  lbClient.textContent = p.client;
+  lbDate.textContent = p.date;
+  lbCategoryText.textContent = p.category;
+}
+
+function closeLightbox() {
+  lb.classList.add("hidden");
+  document.body.style.overflow = "";
+  lbVideo.pause();
+}
+
+function nextItem() {
+  currentIndex = (currentIndex + 1) % currentList.length;
+  paintLightbox();
+}
+function prevItem() {
+  currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+  paintLightbox();
+}
+
+document.getElementById("lb-close").addEventListener("click", closeLightbox);
+document.getElementById("lb-next").addEventListener("click", nextItem);
+document.getElementById("lb-prev").addEventListener("click", prevItem);
+lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
+
+document.addEventListener("keydown", (e) => {
+  if (lb.classList.contains("hidden")) return;
+  if (e.key === "Escape") closeLightbox();
+  if (e.key === "ArrowRight") nextItem();
+  if (e.key === "ArrowLeft") prevItem();
+});
+
+/* ---------------------------- Header + mobile menu ---------------------------- */
+const header = document.getElementById("site-header");
+window.addEventListener("scroll", () => {
+  header.classList.toggle("shadow-lg", window.scrollY > 10);
+  header.classList.toggle("bg-ink-950/95", window.scrollY > 10);
+});
+
+const menuBtn = document.getElementById("menu-btn");
+const mobileMenu = document.getElementById("mobile-menu");
+menuBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+mobileMenu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => mobileMenu.classList.add("hidden")));
+
+/* ---------------------------- Init ---------------------------- */
+renderFilters();
+renderGallery();
+</script>
+</body>
+</html>
