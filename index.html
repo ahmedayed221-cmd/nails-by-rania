@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- French is the default language/direction; assets/i18n.js + the inline
+     script below swap `lang`/`dir` and repaint text on language switch. -->
+<html lang="fr" dir="ltr" class="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nails by Rania — Portfolio</title>
-<meta name="description" content="A minimalist dark-mode portfolio showcasing photography, design and case-study work." />
+<meta name="description" content="Un portfolio épuré en mode sombre présentant photographie, design et études de cas." />
 
 <!-- Tailwind CSS — precompiled locally (see build/ folder) so the site has
      zero runtime dependency on a CDN and works fully offline. To customize
@@ -14,7 +16,7 @@
 <link rel="stylesheet" href="assets/tailwind.css">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
   html { scroll-behavior: smooth; }
@@ -157,6 +159,18 @@
     #cursor-glow { display: none; }
     .hud-scanline::before { animation: none !important; }
   }
+
+  /* Inter/Playfair Display have no Arabic glyph coverage — without this,
+     Arabic text would silently fall back to the browser's default system
+     font, mismatched with the rest of the site's typography. */
+  html[lang="ar"] .font-sans,
+  html[lang="ar"] body { font-family: 'Tajawal', ui-sans-serif, system-ui, sans-serif; }
+  html[lang="ar"] .font-serif { font-family: 'Tajawal', ui-serif, Georgia, serif; font-style: normal; }
+
+  /* Directional nav/chevron icons mirror under RTL; the play-triangle icon
+     is a universal media symbol and is deliberately left alone. */
+  .rtl-flip { transition: none; }
+  html[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
 </style>
 </head>
 
@@ -180,16 +194,17 @@
     </a>
 
     <nav class="hidden md:flex items-center gap-10 text-sm text-ink-400">
-      <a href="#work" class="hover:text-ink-50 transition-colors">Projects</a>
-      <a href="#about" class="hover:text-ink-50 transition-colors">About</a>
-      <a href="#contact" class="hover:text-ink-50 transition-colors">Contact</a>
+      <a href="#work" class="hover:text-ink-50 transition-colors" data-i18n="nav.projects">Projets</a>
+      <a href="#about" class="hover:text-ink-50 transition-colors" data-i18n="nav.about">À propos</a>
+      <a href="#contact" class="hover:text-ink-50 transition-colors" data-i18n="nav.contact">Contact</a>
     </nav>
 
-    <div class="flex items-center gap-4">
-      <a href="#contact" class="hidden sm:inline-flex items-center text-sm border border-white/15 rounded-full px-5 py-2 hover:bg-ink-50 hover:text-ink-950 transition-colors duration-300">
-        Let's talk
+    <div class="flex items-center gap-5">
+      <div id="lang-switcher" class="hidden sm:flex items-center gap-3 text-xs text-ink-500" role="group" aria-label="Language / Langue / اللغة"></div>
+      <a href="#contact" class="hidden sm:inline-flex items-center text-sm border border-white/15 rounded-full px-5 py-2 hover:bg-ink-50 hover:text-ink-950 transition-colors duration-300" data-i18n="nav.talk">
+        Discutons
       </a>
-      <button id="menu-btn" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5" aria-label="Open menu">
+      <button id="menu-btn" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5" data-i18n-aria="nav.openMenu" aria-label="Ouvrir le menu">
         <span class="w-5 h-px bg-ink-50"></span>
         <span class="w-5 h-px bg-ink-50"></span>
       </button>
@@ -198,9 +213,10 @@
 
   <!-- mobile menu -->
   <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-ink-950/95 px-6 py-6 flex flex-col gap-5 text-ink-300">
-    <a href="#work" class="mobile-link">Projects</a>
-    <a href="#about" class="mobile-link">About</a>
-    <a href="#contact" class="mobile-link">Contact</a>
+    <a href="#work" class="mobile-link" data-i18n="nav.projects">Projets</a>
+    <a href="#about" class="mobile-link" data-i18n="nav.about">À propos</a>
+    <a href="#contact" class="mobile-link" data-i18n="nav.contact">Contact</a>
+    <div id="lang-switcher-mobile" class="flex items-center gap-4 text-sm pt-1" role="group" aria-label="Language / Langue / اللغة"></div>
   </div>
 </header>
 
@@ -208,35 +224,35 @@
 <section id="top" class="relative pt-40 pb-20 px-6 lg:px-10 overflow-hidden">
   <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-6 items-center">
     <div class="lg:col-span-7">
-      <p class="fade-in text-accent text-xs tracking-[0.3em] uppercase mb-6">Photography · Nail Art · Design</p>
-      <h1 class="fade-in text-[2.5rem] sm:text-6xl lg:text-7xl font-serif leading-[1.05] max-w-4xl" style="animation-delay:80ms">
-        Detail‑obsessed work,<br class="hidden sm:block" /> shot and shown <span class="italic text-ink-400">with care.</span>
+      <p class="fade-in text-accent text-xs tracking-[0.3em] uppercase mb-6" data-i18n="hero.eyebrow">Photographie · Nail Art · Design</p>
+      <h1 class="fade-in text-[2.5rem] sm:text-6xl lg:text-7xl font-serif leading-[1.05] max-w-4xl" style="animation-delay:80ms" data-i18n-html="hero.headingHTML">
+        Un travail obsédé par le détail,<br class="hidden sm:block" /> photographié et présenté <span class="italic text-ink-400">avec soin.</span>
       </h1>
-      <p class="fade-in mt-8 text-ink-400 max-w-xl leading-relaxed" style="animation-delay:160ms">
-        A curated collection of hand-painted nail art, close-up photography and
-        case studies — built for clients who care about the finish as much as the idea.
+      <p class="fade-in mt-8 text-ink-400 max-w-xl leading-relaxed" style="animation-delay:160ms" data-i18n="hero.paragraph">
+        Une collection sélectionnée d'art des ongles peint à la main, de photographie
+        en gros plan et d'études de cas — pensée pour les clientes qui accordent autant d'importance à la finition qu'à l'idée.
       </p>
       <div class="fade-in mt-10 flex items-center gap-6" style="animation-delay:240ms">
         <a href="#work" class="btn-glow inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
-          View the gallery
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-i18n="hero.cta">Voir la galerie</span>
+          <svg class="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <span class="text-sm text-ink-600">7 projects · updated 2026</span>
+        <span id="hero-count" class="text-sm text-ink-600">7 projets · mis à jour en 2026</span>
       </div>
     </div>
     <div class="fade-in lg:col-span-5 flex items-center justify-center" style="animation-delay:120ms">
       <div id="hero3d" class="w-64 h-64 sm:w-80 sm:h-80 lg:w-full lg:h-[26rem] cursor-grab" aria-hidden="true"></div>
     </div>
   </div>
-  <div class="pointer-events-none absolute -top-40 right-0 w-[36rem] h-[36rem] bg-accent/10 blur-[140px] rounded-full"></div>
-  <div class="pointer-events-none absolute top-1/3 right-[8%] w-[26rem] h-[26rem] bg-accent/20 blur-[100px] rounded-full hidden lg:block"></div>
+  <div class="pointer-events-none absolute -top-40 end-0 w-[36rem] h-[36rem] bg-accent/10 blur-[140px] rounded-full"></div>
+  <div class="pointer-events-none absolute top-1/3 end-[8%] w-[26rem] h-[26rem] bg-accent/20 blur-[100px] rounded-full hidden lg:block"></div>
 </section>
 
 <!-- ============================= FILTER BAR ============================= -->
 <section class="sticky top-20 z-40 bg-ink-950/90 backdrop-blur-xl border-y border-white/5 px-6 lg:px-10">
   <div class="max-w-7xl mx-auto py-5 flex items-center gap-8 overflow-x-auto no-scrollbar text-sm">
     <div id="filters" class="flex items-center gap-8 text-ink-400 whitespace-nowrap"></div>
-    <div class="ml-auto hidden sm:flex items-center gap-3 text-ink-600 whitespace-nowrap">
+    <div class="ms-auto hidden sm:flex items-center gap-3 text-ink-600 whitespace-nowrap">
       <span id="carousel-progress"></span>
       <span aria-hidden="true">·</span>
       <span id="result-count"></span>
@@ -247,12 +263,12 @@
 <!-- ============================= GALLERY ============================= -->
 <main id="work" class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
   <div class="relative">
-    <button id="carousel-prev" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" aria-label="Scroll left">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button id="carousel-prev" class="hidden md:flex absolute start-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" data-i18n-aria="gallery.scrollPrev" aria-label="Précédent">
+      <svg class="rtl-flip" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div id="gallery" class="flex gap-5 overflow-x-auto snap-x snap-mandatory cursor-grab"></div>
-    <button id="carousel-next" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" aria-label="Scroll right">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button id="carousel-next" class="hidden md:flex absolute end-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 bg-ink-950/80 backdrop-blur items-center justify-center hover:bg-white/10 transition-colors" data-i18n-aria="gallery.scrollNext" aria-label="Suivant">
+      <svg class="rtl-flip" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
 </main>
@@ -261,26 +277,26 @@
 <section id="about" class="border-t border-white/5 px-6 lg:px-10 py-24">
   <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-10">
     <div class="md:col-span-4">
-      <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4">About</p>
-      <h2 class="text-3xl font-serif">The hands behind the work</h2>
+      <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4" data-i18n="about.eyebrow">À propos</p>
+      <h2 class="text-3xl font-serif" data-i18n="about.heading">Les mains derrière le travail</h2>
     </div>
     <div class="md:col-span-7 md:col-start-6 text-ink-400 leading-relaxed space-y-5">
-      <p>
-        I'm Rania, a nail artist working at the intersection of fine detail
-        and everyday craft — hand-painted sets, sculpted 3D florals, and the
-        close-up photography and process reels that document them. Every set
-        on this site started as a client brief and ended up as something I
-        was proud to shoot close up.
+      <p data-i18n="about.paragraph1">
+        Je suis Rania, une nail artist qui travaille à la croisée du détail
+        minutieux et de l'artisanat du quotidien — sets peints à la main, fleurs
+        3D sculptées, et la photographie en gros plan et les reels de processus
+        qui les documentent. Chaque set présenté ici est parti d'un brief client
+        pour devenir quelque chose que j'étais fière de photographier en gros plan.
       </p>
-      <p>
-        This portfolio is intentionally minimal: dark background, high-contrast
-        type, and a grid that puts the work first. Filter by category above, or
-        open any piece for the full write-up.
+      <p data-i18n="about.paragraph2">
+        Ce portfolio est volontairement minimaliste : fond sombre, typographie
+        à fort contraste, et une grille qui met le travail en avant. Filtrez
+        par catégorie ci-dessus, ou ouvrez une pièce pour la description complète.
       </p>
       <div class="flex gap-10 pt-4 text-ink-50">
-        <div><p class="text-2xl font-serif">7+</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Projects</p></div>
-        <div><p class="text-2xl font-serif">3</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Categories</p></div>
-        <div><p class="text-2xl font-serif">2026</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1">Latest work</p></div>
+        <div><p class="text-2xl font-serif">7+</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1" data-i18n="about.statProjects">Projets</p></div>
+        <div><p class="text-2xl font-serif">3</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1" data-i18n="about.statCategories">Catégories</p></div>
+        <div><p class="text-2xl font-serif">2026</p><p class="text-xs text-ink-600 uppercase tracking-wider mt-1" data-i18n="about.statLatest">Dernier travail</p></div>
       </div>
     </div>
   </div>
@@ -289,9 +305,9 @@
 <!-- ============================= CONTACT / FOOTER ============================= -->
 <footer id="contact" class="border-t border-white/5 px-6 lg:px-10 py-24">
   <div class="max-w-7xl mx-auto">
-    <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4">Contact</p>
-    <h2 class="text-3xl sm:text-5xl font-serif max-w-2xl">
-      Have a project in mind? Let's make something worth a second look.
+    <p class="text-accent text-xs tracking-[0.3em] uppercase mb-4" data-i18n="contact.eyebrow">Contact</p>
+    <h2 class="text-3xl sm:text-5xl font-serif max-w-2xl" data-i18n="contact.heading">
+      Un projet en tête ? Créons ensemble quelque chose qui mérite un second regard.
     </h2>
     <div class="mt-10 flex flex-wrap items-center gap-6">
       <a href="mailto:rania93mallem@gmail.com" class="inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
@@ -314,8 +330,8 @@
         <span class="font-serif italic text-xl tracking-wide">Nails by Rania<span class="text-accent">.</span></span>
       </div>
       <div class="flex flex-col sm:flex-row justify-between gap-4 text-xs text-ink-600">
-        <p>© 2026 Nails by Rania. All rights reserved.</p>
-        <p>Built with Tailwind CSS &amp; vanilla JS.</p>
+        <p data-i18n="footer.copyright">© 2026 Nails by Rania. Tous droits réservés.</p>
+        <p data-i18n="footer.builtWith">Réalisé avec Tailwind CSS et JavaScript natif.</p>
       </div>
     </div>
   </div>
@@ -323,15 +339,15 @@
 
 <!-- ============================= LIGHTBOX ============================= -->
 <div id="lightbox" class="fixed inset-0 z-[100] hidden bg-ink-950/95">
-  <button id="lb-close" class="absolute top-6 right-6 sm:top-8 sm:right-10 z-10 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Close">
+  <button id="lb-close" class="absolute top-6 end-6 sm:top-8 sm:end-10 z-10 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" data-i18n-aria="lightbox.close" aria-label="Fermer">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   </button>
 
-  <button id="lb-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Previous">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <button id="lb-prev" class="absolute start-2 sm:start-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" data-i18n-aria="lightbox.previous" aria-label="Précédent">
+    <svg class="rtl-flip" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
-  <button id="lb-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Next">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <button id="lb-next" class="absolute end-2 sm:end-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 transition-colors" data-i18n-aria="lightbox.next" aria-label="Suivant">
+    <svg class="rtl-flip" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
   <div class="h-full w-full flex flex-col lg:flex-row items-center gap-0 lg:gap-0">
@@ -339,120 +355,148 @@
       <img id="lb-img" src="" alt="" class="lb-img max-h-full max-w-full object-contain rounded-sm shadow-2xl" />
       <video id="lb-video" src="" controls playsinline class="lb-img hidden w-full h-full max-h-full max-w-full object-contain rounded-sm shadow-2xl"></video>
     </div>
-    <div class="w-full lg:w-[26rem] lg:h-full border-t lg:border-t-0 lg:border-l border-white/10 px-8 py-8 sm:px-12 sm:py-12 overflow-y-auto">
+    <div class="w-full lg:w-[26rem] lg:h-full border-t lg:border-t-0 lg:border-s border-white/10 px-8 py-8 sm:px-12 sm:py-12 overflow-y-auto text-start">
       <p id="lb-cat" class="text-accent text-xs tracking-[0.3em] uppercase mb-3"></p>
       <h3 id="lb-title" class="text-2xl sm:text-3xl font-serif mb-4"></h3>
       <p id="lb-desc" class="text-ink-400 leading-relaxed text-sm mb-8"></p>
       <dl class="space-y-3 text-sm">
         <div class="flex justify-between border-b border-white/5 pb-3">
-          <dt class="text-ink-600">Client</dt><dd id="lb-client" class="text-ink-200"></dd>
+          <dt class="text-ink-600" data-i18n="lightbox.client">Client</dt><dd id="lb-client" class="text-ink-200"></dd>
         </div>
         <div class="flex justify-between border-b border-white/5 pb-3">
-          <dt class="text-ink-600">Date</dt><dd id="lb-date" class="text-ink-200"></dd>
+          <dt class="text-ink-600" data-i18n="lightbox.date">Date</dt><dd id="lb-date" class="text-ink-200"></dd>
         </div>
         <div class="flex justify-between border-b border-white/5 pb-3">
-          <dt class="text-ink-600">Category</dt><dd id="lb-category-text" class="text-ink-200"></dd>
+          <dt class="text-ink-600" data-i18n="lightbox.category">Catégorie</dt><dd id="lb-category-text" class="text-ink-200"></dd>
         </div>
       </dl>
-      <p class="mt-8 text-xs text-ink-600">Use ← → to navigate, Esc to close</p>
+      <p class="mt-8 text-xs text-ink-600" data-i18n="lightbox.hint">Utilisez ← → pour naviguer, Échap pour fermer</p>
     </div>
   </div>
 </div>
 
+<script src="assets/i18n.js"></script>
 <script>
 /* =========================================================================
    PLACEHOLDER PROJECT DATA
    ---------------------------------------------------------------------
    Swap this array with your own work. Each item needs:
-     id        – unique string
-     title     – project title shown on hover + in the lightbox
-     category  – must match one of CATEGORY_LIST below (drives the filters)
-     year      – shown on hover + lightbox
-     client    – shown in lightbox meta
-     date      – shown in lightbox meta (free text, e.g. "March 2026")
-     image     – path to the thumbnail/full image (local path or URL)
-     description – longer copy shown in the lightbox
-     size      – "tall" | "normal" | "wide" — purely cosmetic, varies card height
+     id           – unique string
+     categoryKey  – must match a key in CATEGORIES (assets/i18n.js) — this
+                    drives the filters; it's a stable internal id, never the
+                    translated label, so switching language never breaks an
+                    active filter
+     title, description, client, date – each an { fr, en, ar } object
+     year         – shown on hover + lightbox (language-neutral)
+     image        – path to the thumbnail/full image (local path or URL)
+     size         – "tall" | "normal" | "wide" — currently unused by the
+                    carousel layout (all cards render at a fixed 4:5 ratio)
    ========================================================================= */
-const CATEGORY_LIST = ["All", "Photography", "Nail Art", "Case Studies"];
-
 const PROJECTS = [
   {
     id: "proj-01",
-    title: "Sculpted Petals",
-    category: "Nail Art",
+    categoryKey: "nail-art",
     year: "2026",
-    client: "Private client",
-    date: "August 2026",
     image: "assets/images/nail-07.jpg",
-    description: "Sky-blue French tips paired with hand-sculpted 3D floral accents and gold micro-beading. Shot in natural light to capture the gel's translucency.",
     size: "tall",
+    title: { fr: "Pétales Sculptés", en: "Sculpted Petals", ar: "بتلات منحوتة" },
+    client: { fr: "Client privé", en: "Private client", ar: "عميلة خاصة" },
+    date: { fr: "Août 2026", en: "August 2026", ar: "أغسطس 2026" },
+    description: {
+      fr: "French tips bleu ciel associées à des accents floraux 3D sculptés à la main et à un micro-perlage doré. Photographié en lumière naturelle pour capturer la translucidité du gel.",
+      en: "Sky-blue French tips paired with hand-sculpted 3D floral accents and gold micro-beading. Shot in natural light to capture the gel's translucency.",
+      ar: "أطراف فرنسية بلون أزرق سماوي مع لمسات زهور ثلاثية الأبعاد منحوتة يدويًا وحبيبات ذهبية دقيقة. تم التصوير بإضاءة طبيعية لإبراز شفافية الجل.",
+    },
   },
   {
     id: "proj-02",
-    title: "Ivory Bloom",
-    category: "Nail Art",
+    categoryKey: "nail-art",
     year: "2026",
-    client: "Studio session",
-    date: "August 2026",
     image: "assets/images/nail-02.jpg",
-    description: "A soft ivory french set with sculpted 3D florals and warm gold detailing — designed for an editorial hand-modeling shoot.",
     size: "normal",
+    title: { fr: "Floraison Ivoire", en: "Ivory Bloom", ar: "إزهار عاجي" },
+    client: { fr: "Séance en studio", en: "Studio session", ar: "جلسة استوديو" },
+    date: { fr: "Août 2026", en: "August 2026", ar: "أغسطس 2026" },
+    description: {
+      fr: "Un set french ivoire tout en douceur, orné de fleurs 3D sculptées et de détails dorés chauds — conçu pour une séance photo éditoriale de mannequinat mains.",
+      en: "A soft ivory french set with sculpted 3D florals and warm gold detailing — designed for an editorial hand-modeling shoot.",
+      ar: "طقم فرنسي بلون العاج الناعم مزين بزهور ثلاثية الأبعاد منحوتة وتفاصيل ذهبية دافئة — صُمم لجلسة تصوير تحريرية لعارضة أيدٍ.",
+    },
   },
   {
     id: "proj-03",
-    title: "Frost Line",
-    category: "Nail Art",
+    categoryKey: "nail-art",
     year: "2025",
-    client: "Winter capsule",
-    date: "December 2025",
     image: "assets/images/nail-01.jpg",
-    description: "Fine-line snowflake and stripe work in white on a sheer pink base, part of a limited winter capsule collection.",
     size: "normal",
+    title: { fr: "Ligne de Givre", en: "Frost Line", ar: "خط الصقيع" },
+    client: { fr: "Capsule hiver", en: "Winter capsule", ar: "مجموعة الشتاء" },
+    date: { fr: "Décembre 2025", en: "December 2025", ar: "ديسمبر 2025" },
+    description: {
+      fr: "Motifs fins de flocons de neige et de rayures blanches sur une base rose translucide, issus d'une collection capsule hiver en édition limitée.",
+      en: "Fine-line snowflake and stripe work in white on a sheer pink base, part of a limited winter capsule collection.",
+      ar: "رسومات دقيقة لندف الثلج وخطوط بيضاء على قاعدة وردية شفافة، من مجموعة شتوية محدودة الإصدار.",
+    },
   },
   {
     id: "proj-04",
-    title: "Candy Cane Set",
-    category: "Photography",
+    categoryKey: "photography",
     year: "2025",
-    client: "Holiday campaign",
-    date: "December 2025",
     image: "assets/images/nail-03.jpg",
-    description: "Close-up product photography for a holiday nail-art campaign — deep reds, glitter accents and hand-painted snowflakes.",
     size: "wide",
+    title: { fr: "Set Canne à Sucre", en: "Candy Cane Set", ar: "طقم عصا الحلوى" },
+    client: { fr: "Campagne des fêtes", en: "Holiday campaign", ar: "حملة الأعياد" },
+    date: { fr: "Décembre 2025", en: "December 2025", ar: "ديسمبر 2025" },
+    description: {
+      fr: "Photographie produit en gros plan pour une campagne d'art des ongles de fin d'année — rouges profonds, accents pailletés et flocons de neige peints à la main.",
+      en: "Close-up product photography for a holiday nail-art campaign — deep reds, glitter accents and hand-painted snowflakes.",
+      ar: "تصوير منتج عن قرب لحملة فن أظافر بمناسبة الأعياد — أحمر داكن، لمسات لامعة وندف ثلج مرسومة يدويًا.",
+    },
   },
   {
     id: "proj-05",
-    title: "Ruby Dot Minimal",
-    category: "Case Studies",
+    categoryKey: "case-studies",
     year: "2026",
-    client: "Minimal line study",
-    date: "June 2026",
     image: "assets/images/nail-04.jpg",
-    description: "A case study in restraint — soft pink base, single-line French edges and scattered ruby micro-dots. Documented from sketch to final set.",
     size: "normal",
+    title: { fr: "Minimalisme Point Rubis", en: "Ruby Dot Minimal", ar: "نقاط الياقوت البسيطة" },
+    client: { fr: "Étude de ligne minimale", en: "Minimal line study", ar: "دراسة خط بسيطة" },
+    date: { fr: "Juin 2026", en: "June 2026", ar: "يونيو 2026" },
+    description: {
+      fr: "Une étude de cas sur la retenue — base rose pâle, bords french en ligne fine et micro-points rubis dispersés. Documentée du croquis jusqu'au set final.",
+      en: "A case study in restraint — soft pink base, single-line French edges and scattered ruby micro-dots. Documented from sketch to final set.",
+      ar: "دراسة حالة في التقشف — قاعدة وردية ناعمة، حواف فرنسية بخط رفيع ونقاط ياقوتية دقيقة متناثرة. موثقة من الرسم الأولي حتى الطقم النهائي.",
+    },
   },
   {
     id: "proj-06",
-    title: "Cobalt Bloom",
-    category: "Nail Art",
+    categoryKey: "nail-art",
     year: "2026",
-    client: "Private client",
-    date: "May 2026",
     image: "assets/images/nail-05.jpg",
-    description: "Navy polka-dot tips with a single hand-painted cobalt floral accent nail, finished with high-gloss top coat.",
     size: "tall",
+    title: { fr: "Floraison Cobalt", en: "Cobalt Bloom", ar: "إزهار الكوبالت" },
+    client: { fr: "Client privé", en: "Private client", ar: "عميلة خاصة" },
+    date: { fr: "Mai 2026", en: "May 2026", ar: "مايو 2026" },
+    description: {
+      fr: "Pointes à pois bleu marine avec un ongle accent floral cobalt peint à la main, fini par un top coat ultra brillant.",
+      en: "Navy polka-dot tips with a single hand-painted cobalt floral accent nail, finished with high-gloss top coat.",
+      ar: "أطراف بنقاط كحلية مع ظفر واحد بلمسة زهرية كوبالت مرسومة يدويًا، مع طلاء نهائي فائق اللمعان.",
+    },
   },
   {
     id: "proj-07",
-    title: "Citrus Flame",
-    category: "Photography",
+    categoryKey: "photography",
     year: "2026",
-    client: "Summer editorial",
-    date: "July 2026",
     image: "assets/images/nail-06.jpg",
-    description: "Warm ombré tips in yellow-to-orange with hand-painted florals and fine red detailing, photographed for a summer editorial spread.",
     size: "normal",
+    title: { fr: "Flamme d'Agrumes", en: "Citrus Flame", ar: "لهب الحمضيات" },
+    client: { fr: "Éditorial d'été", en: "Summer editorial", ar: "تحرير صيفي" },
+    date: { fr: "Juillet 2026", en: "July 2026", ar: "يوليو 2026" },
+    description: {
+      fr: "Pointes ombrées chaudes du jaune à l'orange, avec fleurs peintes à la main et fins détails rouges, photographiées pour un éditorial d'été.",
+      en: "Warm ombré tips in yellow-to-orange with hand-painted florals and fine red detailing, photographed for a summer editorial spread.",
+      ar: "أطراف متدرجة دافئة من الأصفر إلى البرتقالي، مع زهور مرسومة يدويًا وتفاصيل حمراء دقيقة، تم تصويرها لملف صيفي تحريري.",
+    },
   },
 ];
 
@@ -466,15 +510,17 @@ const resultCountEl = document.getElementById("result-count");
 const progressEl = document.getElementById("carousel-progress");
 const carouselPrevBtn = document.getElementById("carousel-prev");
 const carouselNextBtn = document.getElementById("carousel-next");
+const langSwitcherEl = document.getElementById("lang-switcher");
+const langSwitcherMobileEl = document.getElementById("lang-switcher-mobile");
 
-let activeCategory = "All";
+let activeCategory = "all";
 
 function renderFilters() {
-  filtersEl.innerHTML = CATEGORY_LIST.map((cat) => `
+  filtersEl.innerHTML = CATEGORY_KEYS.map((key) => `
     <button
-      class="filter-btn pb-1 transition-colors ${cat === activeCategory ? "active text-ink-50" : "hover:text-ink-50"}"
-      data-cat="${cat}"
-    >${cat}</button>
+      class="filter-btn pb-1 transition-colors ${key === activeCategory ? "active text-ink-50" : "hover:text-ink-50"}"
+      data-cat="${key}"
+    >${CATEGORIES[key][currentLang]}</button>
   `).join("");
 
   filtersEl.querySelectorAll(".filter-btn").forEach((btn) => {
@@ -487,17 +533,17 @@ function renderFilters() {
 }
 
 function renderGallery() {
-  const items = PROJECTS.filter((p) => activeCategory === "All" || p.category === activeCategory);
-  resultCountEl.textContent = `${items.length} project${items.length === 1 ? "" : "s"}`;
+  const items = PROJECTS.filter((p) => activeCategory === "all" || p.categoryKey === activeCategory);
+  resultCountEl.textContent = UI_STRINGS[currentLang].gallery.count(items.length);
 
   galleryEl.innerHTML = items.map((p, i) => `
     <div class="shrink-0 w-[70vw] md:w-[420px] snap-start fade-in" style="animation-delay:${i * 60}ms">
       <div class="carousel-card-inner">
         <button
-          class="card group relative w-full aspect-[4/5] overflow-hidden rounded-md border border-white/5 bg-ink-900 block text-left"
+          class="card group relative w-full aspect-[4/5] overflow-hidden rounded-md border border-white/5 bg-ink-900 block text-start"
           data-id="${p.id}"
         >
-          <img src="${p.image}" alt="${p.title}" loading="lazy" draggable="false"
+          <img src="${p.image}" alt="${p.title[currentLang]}" loading="lazy" draggable="false"
                class="card-img absolute inset-0 w-full h-full object-cover" />
           <div class="hud-grid"></div>
           <div class="hud-scanline"></div>
@@ -506,13 +552,13 @@ function renderGallery() {
           <span class="hud-corner hud-corner-bl"></span>
           <span class="hud-corner hud-corner-br"></span>
           ${p.video ? `
-          <div class="absolute top-3 right-3 w-9 h-9 rounded-full bg-ink-950/70 backdrop-blur flex items-center justify-center border border-white/10">
+          <div class="absolute top-3 end-3 w-9 h-9 rounded-full bg-ink-950/70 backdrop-blur flex items-center justify-center border border-white/10">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="text-ink-50 translate-x-[1px]"><path d="M8 5v14l11-7z"/></svg>
           </div>` : ""}
           <div class="card-overlay absolute inset-0"></div>
           <div class="card-meta absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-[11px] tracking-[0.25em] uppercase text-accent mb-1">${p.category} · ${p.year}</p>
-            <h3 class="text-lg font-serif text-ink-50">${p.title}</h3>
+            <p class="text-[11px] tracking-[0.25em] uppercase text-accent mb-1">${CATEGORIES[p.categoryKey][currentLang]} · ${p.year}</p>
+            <h3 class="text-lg font-serif text-ink-50">${p.title[currentLang]}</h3>
           </div>
         </button>
       </div>
@@ -526,12 +572,57 @@ function renderGallery() {
     });
   });
 
-  galleryEl.scrollLeft = 0;
+  scrollGalleryToStart();
   updateCarouselProgress();
   updateCoverflow();
 }
 
-/* ---------------------------- Carousel controls ---------------------------- */
+/* ---------------------------- RTL-aware scroll helpers ----------------------------
+   scrollLeft's numeric convention under dir="rtl" historically differs by
+   browser engine (0-at-start-going-negative vs max-at-start-going-to-zero).
+   Modern evergreen browsers have converged on the spec's "negative" behavior,
+   but we still feature-detect defensively rather than assume it. This only
+   ever runs when the page is actually RTL (Arabic). */
+function isRTL() {
+  return document.documentElement.dir === "rtl";
+}
+
+let rtlScrollType = null; // 'negative' | 'reverse' | 'positive-descending' — resolved lazily
+function detectRtlScrollType() {
+  const probe = document.createElement("div");
+  probe.dir = "rtl";
+  probe.style.cssText = "position:absolute; top:-9999px; width:4px; height:4px; overflow:scroll;";
+  probe.innerHTML = '<div style="width:100px; height:1px;"></div>';
+  document.body.appendChild(probe);
+  let type;
+  if (probe.scrollLeft > 0) {
+    type = "positive-descending"; // legacy engines: starts at max, decreases toward 0
+  } else {
+    probe.scrollLeft = -1;
+    type = probe.scrollLeft < 0 ? "negative" : "reverse";
+  }
+  document.body.removeChild(probe);
+  return type;
+}
+
+/* "Start" = the reading-start edge: right in RTL, left in LTR. */
+function scrollGalleryToStart() {
+  if (!isRTL()) { galleryEl.scrollLeft = 0; return; }
+  if (rtlScrollType === null) rtlScrollType = detectRtlScrollType();
+  galleryEl.scrollLeft = rtlScrollType === "positive-descending"
+    ? galleryEl.scrollWidth - galleryEl.clientWidth
+    : 0;
+}
+
+/* `left` delta for scrollBy() that moves one step further into reading order
+   (what the "next" arrow does) — in RTL this is always a decrease in
+   scrollLeft regardless of which of the three conventions is in play, since
+   all three place "start" at the numerically-higher-or-zero end and "forward"
+   moves toward the numerically-lower end. */
+function forwardScrollDelta(step) {
+  return isRTL() ? -step : step;
+}
+
 const CAROUSEL_GAP_PX = 20; // matches gap-5
 
 function carouselStep() {
@@ -539,13 +630,18 @@ function carouselStep() {
   return first ? first.getBoundingClientRect().width + CAROUSEL_GAP_PX : 0;
 }
 
+/* Uses getBoundingClientRect() (real viewport pixels) rather than scrollLeft
+   comparisons, so it's correct regardless of the RTL scrollLeft convention. */
 function updateCarouselProgress() {
   const cards = Array.from(galleryEl.children);
   if (!cards.length) { progressEl.textContent = ""; return; }
+  const rect = galleryEl.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
   let closest = 0;
   let closestDist = Infinity;
   cards.forEach((card, i) => {
-    const dist = Math.abs(card.offsetLeft - galleryEl.scrollLeft);
+    const cardRect = card.getBoundingClientRect();
+    const dist = Math.abs((cardRect.left + cardRect.width / 2) - centerX);
     if (dist < closestDist) { closestDist = dist; closest = i; }
   });
   progressEl.textContent = `${closest + 1} / ${cards.length}`;
@@ -599,10 +695,10 @@ galleryEl.addEventListener("scroll", scheduleCarouselUpdate, { passive: true });
 window.addEventListener("resize", scheduleCarouselUpdate);
 
 carouselPrevBtn.addEventListener("click", () => {
-  galleryEl.scrollBy({ left: -carouselStep(), behavior: "smooth" });
+  galleryEl.scrollBy({ left: forwardScrollDelta(-carouselStep()), behavior: "smooth" });
 });
 carouselNextBtn.addEventListener("click", () => {
-  galleryEl.scrollBy({ left: carouselStep(), behavior: "smooth" });
+  galleryEl.scrollBy({ left: forwardScrollDelta(carouselStep()), behavior: "smooth" });
 });
 
 /* Click-and-drag scrolling for desktop mouse users (touch already gets native swipe) */
@@ -623,7 +719,11 @@ window.addEventListener("mousemove", (e) => {
   if (!carouselDragging) return;
   const dx = e.pageX - carouselDragStartX;
   if (Math.abs(dx) > 5) carouselDragMoved = true;
-  galleryEl.scrollLeft = carouselDragStartScroll - dx;
+  // Dragging the cursor right should always move content right on screen —
+  // that visual/scrollLeft relationship flips sign under RTL (see the
+  // scrollLeft convention note above), independent of which of the three
+  // conventions the browser uses.
+  galleryEl.scrollLeft = carouselDragStartScroll + (isRTL() ? dx : -dx);
 });
 
 window.addEventListener("mouseup", () => {
@@ -646,7 +746,7 @@ let currentIndex = 0;
 let currentList = PROJECTS;
 
 function openLightbox(id) {
-  currentList = PROJECTS.filter((p) => activeCategory === "All" || p.category === activeCategory);
+  currentList = PROJECTS.filter((p) => activeCategory === "all" || p.categoryKey === activeCategory);
   currentIndex = currentList.findIndex((p) => p.id === id);
   paintLightbox();
   lb.classList.remove("hidden");
@@ -673,12 +773,13 @@ function paintLightbox() {
     img.src = p.image;
   }
 
-  lbCat.textContent = `${p.category} · ${p.year}`;
-  lbTitle.textContent = p.title;
-  lbDesc.textContent = p.description;
-  lbClient.textContent = p.client;
-  lbDate.textContent = p.date;
-  lbCategoryText.textContent = p.category;
+  const categoryLabel = CATEGORIES[p.categoryKey][currentLang];
+  lbCat.textContent = `${categoryLabel} · ${p.year}`;
+  lbTitle.textContent = p.title[currentLang];
+  lbDesc.textContent = p.description[currentLang];
+  lbClient.textContent = p.client[currentLang];
+  lbDate.textContent = p.date[currentLang];
+  lbCategoryText.textContent = categoryLabel;
 }
 
 function closeLightbox() {
@@ -704,8 +805,12 @@ lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
 document.addEventListener("keydown", (e) => {
   if (lb.classList.contains("hidden")) return;
   if (e.key === "Escape") closeLightbox();
-  if (e.key === "ArrowRight") nextItem();
-  if (e.key === "ArrowLeft") prevItem();
+  // Physical arrow keys, but "forward" is the physically-left key in RTL —
+  // matches the mirrored reading direction everywhere else on the page.
+  const forwardKey = isRTL() ? "ArrowLeft" : "ArrowRight";
+  const backwardKey = isRTL() ? "ArrowRight" : "ArrowLeft";
+  if (e.key === forwardKey) nextItem();
+  if (e.key === backwardKey) prevItem();
 });
 
 /* ---------------------------- Header + mobile menu ---------------------------- */
@@ -719,6 +824,87 @@ const menuBtn = document.getElementById("menu-btn");
 const mobileMenu = document.getElementById("mobile-menu");
 menuBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
 mobileMenu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => mobileMenu.classList.add("hidden")));
+
+/* ---------------------------- Language switching ---------------------------- */
+const LANG_COOKIE = "lang";
+const DEFAULT_LANG = "fr"; // per spec: default is always French, not browser-detected
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+function setCookie(name, value) {
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
+}
+
+let currentLang = DEFAULT_LANG;
+
+function readNestedString(strings, path) {
+  const value = path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), strings);
+  return typeof value === "string" ? value : null;
+}
+
+function applyStaticTranslations(lang) {
+  const strings = UI_STRINGS[lang];
+
+  document.title = strings.meta.title;
+  const metaDescEl = document.querySelector('meta[name="description"]');
+  if (metaDescEl) metaDescEl.setAttribute("content", strings.meta.description);
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const value = readNestedString(strings, el.dataset.i18n);
+    if (value !== null) el.textContent = value;
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const value = readNestedString(strings, el.dataset.i18nHtml);
+    if (value !== null) el.innerHTML = value;
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    const value = readNestedString(strings, el.dataset.i18nAria);
+    if (value !== null) el.setAttribute("aria-label", value);
+  });
+
+  const heroCountEl = document.getElementById("hero-count");
+  if (heroCountEl) heroCountEl.textContent = strings.hero.countTemplate.replace("{n}", PROJECTS.length);
+}
+
+function renderLangSwitcher() {
+  const html = LANGUAGES.map((l) => `
+    <button
+      type="button"
+      class="filter-btn pb-1 transition-colors ${l.code === currentLang ? "active text-ink-50" : "hover:text-ink-50"}"
+      data-lang="${l.code}"
+    >${l.label}</button>
+  `).join("");
+
+  [langSwitcherEl, langSwitcherMobileEl].forEach((container) => {
+    if (!container) return;
+    container.innerHTML = html;
+    container.querySelectorAll("button").forEach((btn) => {
+      btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
+    });
+  });
+}
+
+function setLanguage(lang) {
+  if (!UI_STRINGS[lang]) return;
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  rtlScrollType = null; // re-detect: the scrollLeft convention only matters once we're actually RTL
+  setCookie(LANG_COOKIE, lang);
+
+  applyStaticTranslations(lang);
+  renderLangSwitcher();
+  renderFilters();
+  renderGallery();
+  mobileMenu.classList.add("hidden");
+}
+
+function getInitialLang() {
+  const saved = getCookie(LANG_COOKIE);
+  return UI_STRINGS[saved] ? saved : DEFAULT_LANG;
+}
 
 /* ---------------------------- Cursor-following ambient light ---------------------------- */
 const cursorGlowEl = document.getElementById("cursor-glow");
@@ -752,8 +938,7 @@ if (cursorGlowEl && prefersFinePointer && !prefersReducedMotion) {
 }
 
 /* ---------------------------- Init ---------------------------- */
-renderFilters();
-renderGallery();
+setLanguage(getInitialLang());
 </script>
 <script type="module" src="assets/hero3d.js"></script>
 </body>
