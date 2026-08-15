@@ -25,8 +25,70 @@
   ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 999px; }
   ::-webkit-scrollbar-thumb:hover { background: #3a3a40; }
 
-  .card-img { transition: transform 900ms cubic-bezier(0.16,1,0.3,1); }
-  .card:hover .card-img { transform: scale(1.06); }
+  /* --focus (0..1, 1 = centered/"locked on") and --dist (-1.4..1.4, signed) are
+     set per-frame by updateCoverflow() in the gallery scroll handler. Defaults
+     (1 / 0) keep cards looking normal before JS has run a first frame. */
+  .card-img {
+    --hover-scale: 1;
+    filter: brightness(calc(0.72 + var(--focus, 1) * 0.28)) saturate(calc(0.55 + var(--focus, 1) * 0.45));
+    transform: scale(calc(1.12 * var(--hover-scale))) translateX(calc(var(--dist, 0) * -18px));
+    transition: transform 500ms cubic-bezier(0.16,1,0.3,1), filter 200ms linear;
+  }
+  .card:hover .card-img { --hover-scale: 1.05; }
+
+  .card {
+    border-color: rgba(201,164,99, calc(0.08 + var(--focus, 1) * 0.42));
+    box-shadow: 0 0 calc(var(--focus, 1) * 34px) rgba(201,164,99, calc(var(--focus, 1) * 0.28));
+    transition: border-color 200ms linear, box-shadow 200ms linear;
+  }
+
+  /* Faint targeting grid — visible while a card is off-focus, fades out as it
+     centers ("target acquired"), like a HUD panel locking on. */
+  .hud-grid {
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(201,164,99,0.55) 0, rgba(201,164,99,0.55) 1px, transparent 1px, transparent 16px),
+      repeating-linear-gradient(90deg, rgba(201,164,99,0.55) 0, rgba(201,164,99,0.55) 1px, transparent 1px, transparent 16px);
+    mix-blend-mode: overlay;
+    opacity: calc((1 - var(--focus, 1)) * 0.4);
+    transition: opacity 200ms linear;
+    pointer-events: none;
+  }
+
+  /* Viewfinder-style corner brackets — glow brightens with focus. */
+  .hud-corner {
+    position: absolute;
+    width: 22px; height: 22px;
+    border-color: #c9a463;
+    opacity: calc(0.35 + var(--focus, 1) * 0.65);
+    filter: drop-shadow(0 0 calc(2px + var(--focus, 1) * 8px) rgba(201,164,99,0.75));
+    transition: opacity 200ms linear, filter 200ms linear;
+    pointer-events: none;
+  }
+  .hud-corner-tl { top: 10px; left: 10px; border-top: 2px solid; border-left: 2px solid; }
+  .hud-corner-tr { top: 10px; right: 10px; border-top: 2px solid; border-right: 2px solid; }
+  .hud-corner-bl { bottom: 10px; left: 10px; border-bottom: 2px solid; border-left: 2px solid; }
+  .hud-corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid; border-right: 2px solid; }
+
+  /* One-shot scan-line sweep, replayed each time a card crosses into focus. */
+  .hud-scanline { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .hud-scanline::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 45%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255,247,234,0.85) 48%, rgba(201,164,99,0.55) 55%, transparent 100%);
+    transform: translateY(-140%);
+    opacity: 0;
+  }
+  .card.scanning .hud-scanline::before { animation: hudScan 1500ms cubic-bezier(0.16,1,0.3,1); }
+  @keyframes hudScan {
+    0% { transform: translateY(-140%); opacity: 0; }
+    12% { opacity: 0.9; }
+    85% { opacity: 0.4; }
+    100% { transform: translateY(240%); opacity: 0; }
+  }
+
   .card-overlay {
     background: linear-gradient(180deg, rgba(10,10,11,0) 40%, rgba(10,10,11,0.92) 100%);
     opacity: 0;
@@ -60,11 +122,47 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
     pointer-events: none;
   }
+
+  /* Hero 3D canvas: Three.js sizes the <canvas> itself via renderer.setSize */
+  #hero3d canvas { display: block; border-radius: 9999px; }
+
+  /* Button glow micro-interaction */
+  .btn-glow { transition: box-shadow 300ms ease, background-color 300ms ease, transform 300ms ease; }
+  .btn-glow:hover { box-shadow: 0 0 28px 2px rgba(201,164,99,0.45); transform: translateY(-1px); }
+
+  /* Cursor-following ambient light (desktop, fine-pointer only) */
+  #cursor-glow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 420px; height: 420px;
+    margin-left: -210px; margin-top: -210px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(201,164,99,0.10) 0%, rgba(201,164,99,0) 70%);
+    pointer-events: none;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 400ms ease;
+    will-change: transform;
+  }
+  #cursor-glow.visible { opacity: 1; }
+
+  /* Gallery coverflow depth (perspective lives on the scroll container itself —
+     the scroll offset affects layout, the per-card 3D transform is a separate
+     paint-time effect, so the two compose without conflict) */
+  #gallery { perspective: 1400px; }
+  #gallery .carousel-card-inner { transition: transform 80ms linear, opacity 80ms linear, filter 80ms linear; will-change: transform, opacity; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in { animation: none; }
+    #cursor-glow { display: none; }
+    .hud-scanline::before { animation: none !important; }
+  }
 </style>
 </head>
 
 <body class="bg-ink-950 text-ink-50 font-sans antialiased selection:bg-accent selection:text-ink-950">
 <div class="grain fixed inset-0 z-[999]"></div>
+<div id="cursor-glow" aria-hidden="true"></div>
 
 <!-- ============================= HEADER ============================= -->
 <header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-white/5 backdrop-blur-xl bg-ink-950/70 transition-all">
@@ -108,24 +206,30 @@
 
 <!-- ============================= HERO ============================= -->
 <section id="top" class="relative pt-40 pb-20 px-6 lg:px-10 overflow-hidden">
-  <div class="max-w-7xl mx-auto">
-    <p class="fade-in text-accent text-xs tracking-[0.3em] uppercase mb-6">Photography · Nail Art · Design</p>
-    <h1 class="fade-in text-[2.5rem] sm:text-6xl lg:text-7xl font-serif leading-[1.05] max-w-4xl" style="animation-delay:80ms">
-      Detail‑obsessed work,<br class="hidden sm:block" /> shot and shown <span class="italic text-ink-400">with care.</span>
-    </h1>
-    <p class="fade-in mt-8 text-ink-400 max-w-xl leading-relaxed" style="animation-delay:160ms">
-      A curated collection of hand-painted nail art, close-up photography and
-      case studies — built for clients who care about the finish as much as the idea.
-    </p>
-    <div class="fade-in mt-10 flex items-center gap-6" style="animation-delay:240ms">
-      <a href="#work" class="inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
-        View the gallery
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <span class="text-sm text-ink-600">7 projects · updated 2026</span>
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-6 items-center">
+    <div class="lg:col-span-7">
+      <p class="fade-in text-accent text-xs tracking-[0.3em] uppercase mb-6">Photography · Nail Art · Design</p>
+      <h1 class="fade-in text-[2.5rem] sm:text-6xl lg:text-7xl font-serif leading-[1.05] max-w-4xl" style="animation-delay:80ms">
+        Detail‑obsessed work,<br class="hidden sm:block" /> shot and shown <span class="italic text-ink-400">with care.</span>
+      </h1>
+      <p class="fade-in mt-8 text-ink-400 max-w-xl leading-relaxed" style="animation-delay:160ms">
+        A curated collection of hand-painted nail art, close-up photography and
+        case studies — built for clients who care about the finish as much as the idea.
+      </p>
+      <div class="fade-in mt-10 flex items-center gap-6" style="animation-delay:240ms">
+        <a href="#work" class="btn-glow inline-flex items-center gap-2 bg-ink-50 text-ink-950 text-sm font-medium rounded-full px-6 py-3 hover:bg-accent transition-colors duration-300">
+          View the gallery
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <span class="text-sm text-ink-600">7 projects · updated 2026</span>
+      </div>
+    </div>
+    <div class="fade-in lg:col-span-5 flex items-center justify-center" style="animation-delay:120ms">
+      <div id="hero3d" class="w-64 h-64 sm:w-80 sm:h-80 lg:w-full lg:h-[26rem] cursor-grab" aria-hidden="true"></div>
     </div>
   </div>
   <div class="pointer-events-none absolute -top-40 right-0 w-[36rem] h-[36rem] bg-accent/10 blur-[140px] rounded-full"></div>
+  <div class="pointer-events-none absolute top-1/3 right-[8%] w-[26rem] h-[26rem] bg-accent/20 blur-[100px] rounded-full hidden lg:block"></div>
 </section>
 
 <!-- ============================= FILTER BAR ============================= -->
@@ -354,6 +458,8 @@ const PROJECTS = [
 
 /* ========================================================================= */
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const galleryEl = document.getElementById("gallery");
 const filtersEl = document.getElementById("filters");
 const resultCountEl = document.getElementById("result-count");
@@ -386,22 +492,30 @@ function renderGallery() {
 
   galleryEl.innerHTML = items.map((p, i) => `
     <div class="shrink-0 w-[70vw] md:w-[420px] snap-start fade-in" style="animation-delay:${i * 60}ms">
-      <button
-        class="card group relative w-full aspect-[4/5] overflow-hidden rounded-md border border-white/5 bg-ink-900 block text-left"
-        data-id="${p.id}"
-      >
-        <img src="${p.image}" alt="${p.title}" loading="lazy" draggable="false"
-             class="card-img absolute inset-0 w-full h-full object-cover" />
-        ${p.video ? `
-        <div class="absolute top-3 right-3 w-9 h-9 rounded-full bg-ink-950/70 backdrop-blur flex items-center justify-center border border-white/10">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="text-ink-50 translate-x-[1px]"><path d="M8 5v14l11-7z"/></svg>
-        </div>` : ""}
-        <div class="card-overlay absolute inset-0"></div>
-        <div class="card-meta absolute bottom-0 left-0 right-0 p-5">
-          <p class="text-[11px] tracking-[0.25em] uppercase text-accent mb-1">${p.category} · ${p.year}</p>
-          <h3 class="text-lg font-serif text-ink-50">${p.title}</h3>
-        </div>
-      </button>
+      <div class="carousel-card-inner">
+        <button
+          class="card group relative w-full aspect-[4/5] overflow-hidden rounded-md border border-white/5 bg-ink-900 block text-left"
+          data-id="${p.id}"
+        >
+          <img src="${p.image}" alt="${p.title}" loading="lazy" draggable="false"
+               class="card-img absolute inset-0 w-full h-full object-cover" />
+          <div class="hud-grid"></div>
+          <div class="hud-scanline"></div>
+          <span class="hud-corner hud-corner-tl"></span>
+          <span class="hud-corner hud-corner-tr"></span>
+          <span class="hud-corner hud-corner-bl"></span>
+          <span class="hud-corner hud-corner-br"></span>
+          ${p.video ? `
+          <div class="absolute top-3 right-3 w-9 h-9 rounded-full bg-ink-950/70 backdrop-blur flex items-center justify-center border border-white/10">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="text-ink-50 translate-x-[1px]"><path d="M8 5v14l11-7z"/></svg>
+          </div>` : ""}
+          <div class="card-overlay absolute inset-0"></div>
+          <div class="card-meta absolute bottom-0 left-0 right-0 p-5">
+            <p class="text-[11px] tracking-[0.25em] uppercase text-accent mb-1">${p.category} · ${p.year}</p>
+            <h3 class="text-lg font-serif text-ink-50">${p.title}</h3>
+          </div>
+        </button>
+      </div>
     </div>
   `).join("");
 
@@ -414,6 +528,7 @@ function renderGallery() {
 
   galleryEl.scrollLeft = 0;
   updateCarouselProgress();
+  updateCoverflow();
 }
 
 /* ---------------------------- Carousel controls ---------------------------- */
@@ -436,11 +551,52 @@ function updateCarouselProgress() {
   progressEl.textContent = `${closest + 1} / ${cards.length}`;
 }
 
-let progressRaf = null;
-galleryEl.addEventListener("scroll", () => {
-  if (progressRaf) return;
-  progressRaf = requestAnimationFrame(() => { updateCarouselProgress(); progressRaf = null; });
-}, { passive: true });
+/* Coverflow depth + HUD "target lock": cards fan away in 3D the further they
+   sit from center, dim/desaturate and show a targeting grid while off-focus,
+   then glow, sharpen and fire a one-shot scan-line sweep as they center. */
+function updateCoverflow() {
+  const rect = galleryEl.getBoundingClientRect();
+  if (!rect.width) return;
+  const centerX = rect.left + rect.width / 2;
+  Array.from(galleryEl.children).forEach((item) => {
+    const inner = item.querySelector(".carousel-card-inner");
+    const card = item.querySelector(".card");
+    if (!inner || !card) return;
+
+    const itemRect = item.getBoundingClientRect();
+    const itemCenter = itemRect.left + itemRect.width / 2;
+    const dist = Math.max(-1.4, Math.min(1.4, (itemCenter - centerX) / (rect.width / 2)));
+    const magnitude = Math.min(Math.abs(dist), 1);
+    const focus = 1 - magnitude;
+
+    inner.style.transform = `rotateY(${dist * -22}deg) scale(${1 - magnitude * 0.1})`;
+    inner.style.opacity = String(1 - magnitude * 0.35);
+
+    card.style.setProperty("--focus", focus.toFixed(3));
+    card.style.setProperty("--dist", dist.toFixed(3));
+
+    const isFocused = focus > 0.62;
+    const wasFocused = card.dataset.hudFocused === "1";
+    if (isFocused && !wasFocused && !prefersReducedMotion) {
+      card.classList.remove("scanning");
+      void card.offsetWidth; // force reflow so the animation restarts even if it's re-added quickly
+      card.classList.add("scanning");
+    }
+    card.dataset.hudFocused = isFocused ? "1" : "0";
+  });
+}
+
+let carouselRaf = null;
+function scheduleCarouselUpdate() {
+  if (carouselRaf) return;
+  carouselRaf = requestAnimationFrame(() => {
+    updateCarouselProgress();
+    updateCoverflow();
+    carouselRaf = null;
+  });
+}
+galleryEl.addEventListener("scroll", scheduleCarouselUpdate, { passive: true });
+window.addEventListener("resize", scheduleCarouselUpdate);
 
 carouselPrevBtn.addEventListener("click", () => {
   galleryEl.scrollBy({ left: -carouselStep(), behavior: "smooth" });
@@ -564,9 +720,41 @@ const mobileMenu = document.getElementById("mobile-menu");
 menuBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
 mobileMenu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => mobileMenu.classList.add("hidden")));
 
+/* ---------------------------- Cursor-following ambient light ---------------------------- */
+const cursorGlowEl = document.getElementById("cursor-glow");
+const prefersFinePointer = window.matchMedia("(pointer: fine)").matches;
+
+if (cursorGlowEl && prefersFinePointer && !prefersReducedMotion) {
+  let targetX = window.innerWidth / 2;
+  let targetY = window.innerHeight / 2;
+  let curX = targetX;
+  let curY = targetY;
+  let glowRaf = null;
+
+  function tickGlow() {
+    curX += (targetX - curX) * 0.15;
+    curY += (targetY - curY) * 0.15;
+    cursorGlowEl.style.transform = `translate(${curX}px, ${curY}px)`;
+    if (Math.abs(targetX - curX) > 0.5 || Math.abs(targetY - curY) > 0.5) {
+      glowRaf = requestAnimationFrame(tickGlow);
+    } else {
+      glowRaf = null;
+    }
+  }
+
+  window.addEventListener("mousemove", (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+    cursorGlowEl.classList.add("visible");
+    if (!glowRaf) glowRaf = requestAnimationFrame(tickGlow);
+  });
+  document.addEventListener("mouseleave", () => cursorGlowEl.classList.remove("visible"));
+}
+
 /* ---------------------------- Init ---------------------------- */
 renderFilters();
 renderGallery();
 </script>
+<script type="module" src="assets/hero3d.js"></script>
 </body>
 </html>
